@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <span>
+        <ul>
+            <li>1</li>
+            <li>11</li>
+            <li>111</li>
+        </ul>
+        <p></p>
+        <ul>
+            <li>2</li>
+            <li >22</li>
+            <li id="t1">222</li>
+        </ul>
+        <p></p>
+        <ul>
+            <li>3</li>
+            <li >33</li>
+            <li>333</li>
+        </ul>
+    </span>
+<button onclick="dianji()">点击</button>
+</body>
+<script>
+    function dianji(){
+        var zz = $("#t1").parent().index("ul")+1
+        var pp = $("#t1").parent().parent();
+        var bb = $("#t1").parent();
+       var index =  pp.index(bb)+1;
+        alert(zz);
+    }
+
+</script>
+</html>
