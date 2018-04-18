@@ -1,5 +1,8 @@
 package com.wf.service.search;
 
+import com.wf.service.ServiceMultiResult;
+import com.wf.web.form.RentSearch;
+
 public interface ISearchService {
 
     /**
@@ -13,4 +16,7 @@ public interface ISearchService {
      * @param houseId
      */
     void remove(Long houseId);
+
+    //通过es查询
+    ServiceMultiResult<Long> query(RentSearch rentSearch);
 }

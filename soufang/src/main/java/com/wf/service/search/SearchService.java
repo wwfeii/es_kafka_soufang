@@ -2,23 +2,32 @@ package com.wf.service.search;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.primitives.Longs;
+import com.wf.base.HouseSort;
+import com.wf.base.RentValueBlock;
 import com.wf.entity.House;
 import com.wf.entity.HouseDetail;
 import com.wf.entity.HouseTag;
 import com.wf.repository.HouseDetailRepository;
 import com.wf.repository.HouseRepository;
 import com.wf.repository.HouseTagRepository;
+import com.wf.service.ServiceMultiResult;
+import com.wf.web.form.RentSearch;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +160,80 @@ public class SearchService  implements  ISearchService{
     public void remove(Long houseId) {
         this.remove(houseId,0);
     }
+
+    @Override
+    public ServiceMultiResult<Long> query(RentSearch rentSearch) {
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.filter(
+                QueryBuilders.termQuery(HouseIndexKey.CITY_EN_NAME,rentSearch.getCityEnName())
+        );
+        if(rentSearch.getRegionEnName() != null && !"*".equals(rentSearch.getRegionEnName())){
+            boolQuery.filter(
+                    QueryBuilders.termQuery(HouseIndexKey.REGION_EN_NAME,rentSearch.getRegionEnName())
+            );
+        }
+        RentValueBlock area = RentValueBlock.matchArea(rentSearch.getAreaBlock());
+        if(!RentValueBlock.ALL.equals(area)){
+            RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(HouseIndexKey.AREA);
+            if(area.getMax()>0){
+                rangeQuery.lte(area.getMax());
+            }
+            if(area.getMin()>0){
+                rangeQuery.gte(area.getMin());
+            }
+            boolQuery.filter(rangeQuery);
+        }
+        RentValueBlock price = RentValueBlock.matchPrice(rentSearch.getPriceBlock());
+        if(!RentValueBlock.ALL.equals(price)){
+            RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(HouseIndexKey.PRICE);
+            if(price.getMax()>0){
+                rangeQuery.lte(price.getMax());
+            }
+            if(price.getMin()>0){
+                rangeQuery.gte(price.getMin());
+            }
+            boolQuery.filter(rangeQuery);
+        }
+        if(rentSearch.getRentWay()>-1){
+            boolQuery.filter(
+                    QueryBuilders.termQuery(HouseIndexKey.RENT_WAY,rentSearch.getRentWay())
+            );
+        }
+        boolQuery.must(
+                QueryBuilders.multiMatchQuery(rentSearch.getKeywords(),
+                        HouseIndexKey.TITLE,
+                        HouseIndexKey.TRAFFIC,
+                        HouseIndexKey.DISTRICT,
+                        HouseIndexKey.ROUND_SERVICE,
+                        HouseIndexKey.SUBWAY_LINE_NAME,
+                        HouseIndexKey.SUBWAY_STATION_NAME
+                )
+        );
+        SearchRequestBuilder requestBuilder = this.esClient.prepareSearch(INDEX_NAME)
+                .setTypes(INDEX_TYPE)
+                .setQuery(boolQuery)
+                .addSort(
+                        HouseSort.getSortKey(rentSearch.getOrderBy()),
+                        SortOrder.fromString(rentSearch.getOrderDirection())
+                )
+                .setFrom(rentSearch.getStart())
+                .setSize(rentSearch.getSize())
+                .setFetchSource(HouseIndexKey.HOUSE_ID, null);
+        logger.info(requestBuilder.toString());
+
+        List<Long> houseIds = new ArrayList<>();
+        SearchResponse response = requestBuilder.get();
+        if(response.status() != RestStatus.OK){
+            logger.warn("Search status is no ok for " + requestBuilder);
+            return new ServiceMultiResult<>(0, houseIds);
+        }
+        for(SearchHit hit: response.getHits()){
+            System.out.println(hit.getSource());
+            houseIds.add(Longs.tryParse(String.valueOf(hit.getSource().get(HouseIndexKey.HOUSE_ID))));
+        }
+        return new ServiceMultiResult<>(response.getHits().totalHits,houseIds);
+    }
+
     private void remove(Long houseId,int retry){
         if(retry>HouseIndexMessage.MAX_RETRY){
             logger.error("Retry remove times over 3 for house: " + houseId + " Please check it!");

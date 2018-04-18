@@ -101,6 +101,7 @@ public class HouseController {
     public String rentHousePage(@ModelAttribute RentSearch rentSearch,
                                 Model model, HttpSession session,
                                 RedirectAttributes redirectAttributes) {
+        System.out.println(rentSearch.toString());
         if(rentSearch.getCityEnName() == null){
             String cityEnNameInSession = (String) session.getAttribute("cityEnName");
             if(cityEnNameInSession == null){
