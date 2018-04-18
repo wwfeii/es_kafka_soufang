@@ -3,3 +3,35 @@
 [2018-04-18T09:15:21,349][INFO ][o.e.n.Node               ] [node-1] stopped
 [2018-04-18T09:15:21,349][INFO ][o.e.n.Node               ] [node-1] closing ...
 [2018-04-18T09:15:21,365][INFO ][o.e.n.Node               ] [node-1] closed
+[2018-04-18T10:11:53,167][INFO ][o.e.n.Node               ] [node-1] initializing ...
+[2018-04-18T10:11:53,264][INFO ][o.e.e.NodeEnvironment    ] [node-1] using [1] data paths, mounts [[(D:)]], net usable_space [132.3gb], net total_space [138.3gb], types [NTFS]
+[2018-04-18T10:11:53,265][INFO ][o.e.e.NodeEnvironment    ] [node-1] heap size [990.7mb], compressed ordinary object pointers [true]
+[2018-04-18T10:11:53,313][INFO ][o.e.n.Node               ] [node-1] node name [node-1], node ID [nwmqf1q4RLWINr9FbOi9Fw]
+[2018-04-18T10:11:53,319][INFO ][o.e.n.Node               ] [node-1] version[6.2.3], pid[10252], build[c59ff00/2018-03-13T10:06:29.741383Z], OS[Windows 7/6.1/amd64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_161/25.161-b12]
+[2018-04-18T10:11:53,319][INFO ][o.e.n.Node               ] [node-1] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=C:\Users\WANGFE~1\AppData\Local\Temp\elasticsearch, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Delasticsearch, -Des.path.home=D:\aWf\elasticsearch-6.2.3, -Des.path.conf=D:\aWf\elasticsearch-6.2.3\config]
+[2018-04-18T10:11:54,245][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [aggs-matrix-stats]
+[2018-04-18T10:11:54,247][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [analysis-common]
+[2018-04-18T10:11:54,250][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [ingest-common]
+[2018-04-18T10:11:54,251][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [lang-expression]
+[2018-04-18T10:11:54,253][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [lang-mustache]
+[2018-04-18T10:11:54,254][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [lang-painless]
+[2018-04-18T10:11:54,256][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [mapper-extras]
+[2018-04-18T10:11:54,260][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [parent-join]
+[2018-04-18T10:11:54,262][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [percolator]
+[2018-04-18T10:11:54,264][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [rank-eval]
+[2018-04-18T10:11:54,266][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [reindex]
+[2018-04-18T10:11:54,267][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [repository-url]
+[2018-04-18T10:11:54,269][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [transport-netty4]
+[2018-04-18T10:11:54,270][INFO ][o.e.p.PluginsService     ] [node-1] loaded module [tribe]
+[2018-04-18T10:11:54,272][INFO ][o.e.p.PluginsService     ] [node-1] no plugins loaded
+[2018-04-18T10:11:57,880][INFO ][o.e.d.DiscoveryModule    ] [node-1] using discovery type [zen]
+[2018-04-18T10:11:58,669][INFO ][o.e.n.Node               ] [node-1] initialized
+[2018-04-18T10:11:58,670][INFO ][o.e.n.Node               ] [node-1] starting ...
+[2018-04-18T10:11:59,258][INFO ][o.e.t.TransportService   ] [node-1] publish_address {10.12.223.30:9300}, bound_addresses {[::]:9300}
+[2018-04-18T10:11:59,272][INFO ][o.e.b.BootstrapChecks    ] [node-1] bound or publishing to a non-loopback address, enforcing bootstrap checks
+[2018-04-18T10:12:02,354][INFO ][o.e.c.s.MasterService    ] [node-1] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {node-1}{nwmqf1q4RLWINr9FbOi9Fw}{htul8MDwQXiiqZPajj3HZw}{10.12.223.30}{10.12.223.30:9300}
+[2018-04-18T10:12:02,362][INFO ][o.e.c.s.ClusterApplierService] [node-1] new_master {node-1}{nwmqf1q4RLWINr9FbOi9Fw}{htul8MDwQXiiqZPajj3HZw}{10.12.223.30}{10.12.223.30:9300}, reason: apply cluster state (from master [master {node-1}{nwmqf1q4RLWINr9FbOi9Fw}{htul8MDwQXiiqZPajj3HZw}{10.12.223.30}{10.12.223.30:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
+[2018-04-18T10:12:02,570][INFO ][o.e.g.GatewayService     ] [node-1] recovered [1] indices into cluster_state
+[2018-04-18T10:12:03,056][INFO ][o.e.h.n.Netty4HttpServerTransport] [node-1] publish_address {10.12.223.30:9200}, bound_addresses {[::]:9200}
+[2018-04-18T10:12:03,056][INFO ][o.e.c.r.a.AllocationService] [node-1] Cluster health status changed from [RED] to [GREEN] (reason: [shards started [[xunwu][1]] ...]).
+[2018-04-18T10:12:03,059][INFO ][o.e.n.Node               ] [node-1] started
