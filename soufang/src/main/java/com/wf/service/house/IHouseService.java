@@ -5,6 +5,7 @@ import com.wf.service.ServiceResult;
 import com.wf.web.dto.HouseDTO;
 import com.wf.web.form.DatatableSearch;
 import com.wf.web.form.HouseForm;
+import com.wf.web.form.MapSearch;
 import com.wf.web.form.RentSearch;
 
 /**
@@ -35,4 +36,6 @@ public interface IHouseService {
     ServiceResult updateStatus(Long id, int value);
 
     ServiceMultiResult<HouseDTO> query(RentSearch rentSearch);
+
+    ServiceMultiResult<HouseDTO> wholeMapQuery(MapSearch mapSearch);
 }

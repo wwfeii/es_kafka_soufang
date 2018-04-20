@@ -14,10 +14,7 @@ import com.wf.service.search.ISearchService;
 import com.wf.web.dto.HouseDTO;
 import com.wf.web.dto.HouseDetailDTO;
 import com.wf.web.dto.HousePictureDTO;
-import com.wf.web.form.DatatableSearch;
-import com.wf.web.form.HouseForm;
-import com.wf.web.form.PhotoForm;
-import com.wf.web.form.RentSearch;
+import com.wf.web.form.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -330,6 +327,17 @@ public class HouseService implements IHouseService{
         }
 
         return simpleQuery(rentSearch);
+    }
+
+    @Override
+    public ServiceMultiResult<HouseDTO> wholeMapQuery(MapSearch mapSearch) {
+        ServiceMultiResult<Long> serviceResult = searchService.mapQuery(mapSearch.getCityEnName(), mapSearch.getOrderBy(), mapSearch.getOrderDirection(), mapSearch.getStart(), mapSearch.getSize());
+
+        if (serviceResult.getTotal() == 0) {
+            return new ServiceMultiResult<>(0, new ArrayList<>());
+        }
+        List<HouseDTO> houses = wrapperHouseResult(serviceResult.getResult());
+        return new ServiceMultiResult<>(serviceResult.getTotal(), houses);
     }
 
     private List<HouseDTO> wrapperHouseResult(List<Long> houseIds) {

@@ -8,9 +8,13 @@ import com.wf.service.ServiceMultiResult;
 import com.wf.service.ServiceResult;
 import com.wf.service.house.IAddressService;
 import com.wf.service.house.IHouseService;
+import com.wf.service.search.HouseBucketDTO;
+import com.wf.service.search.ISearchService;
 import com.wf.web.dto.*;
+import com.wf.web.form.MapSearch;
 import com.wf.web.form.RentSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +36,20 @@ public class HouseController {
     @Autowired
     private IUserService userService;
 
-
+    @Autowired
+    private ISearchService searchService;
+    /**
+     * 自动补全接口
+     */
+    @GetMapping("rent/house/autocomplete")
+    @ResponseBody
+    public ApiResponse autocomplete(@RequestParam(value = "prefix") String prefix) {
+        if(prefix.isEmpty()){
+            return ApiResponse.ofStatus(ApiResponse.Status.BAD_REQUEST);
+        }
+        ServiceResult<List<String>> result = this.searchService.suggest(prefix);
+        return ApiResponse.ofSuccess(result.getResult());
+    }
 
     /**
      * 获取支持城市列表
@@ -179,10 +196,55 @@ public class HouseController {
         model.addAttribute("agent", userDTOServiceResult.getResult());
         model.addAttribute("house", houseDTO);
 
-        //ServiceResult<Long> aggResult = searchService.aggregateDistrictHouse(city.getEnName(), region.getEnName(), houseDTO.getDistrict());
-        //model.addAttribute("houseCountInDistrict", aggResult.getResult());
+        ServiceResult<Long> aggResult = searchService.aggregateDistrictHouse(city.getEnName(), region.getEnName(), houseDTO.getDistrict());
+        model.addAttribute("houseCountInDistrict", aggResult.getResult());
 
         return "house-detail";
+    }
+
+    /**
+     * 聚合查询不同区的出租数量
+     * @param cityEnName
+     * @param model
+     * @param session
+     * @param redirectAttributes
+     * @return
+     */
+    @GetMapping("rent/house/map")
+    public String retMapPage(@RequestParam(value="cityEnName")String cityEnName,
+                             Model model,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes){
+        ServiceResult<SupportAddressDTO> city =  addressService.findCity(cityEnName);
+        if (!city.isSuccess()) {
+            redirectAttributes.addAttribute("msg", "must_chose_city");
+            return "redirect:/index";
+        } else {
+            session.setAttribute("cityName", cityEnName);
+            model.addAttribute("city", city.getResult());
+        }
+        ServiceMultiResult<SupportAddressDTO> regions = addressService.findAllRegionsByCityName(cityEnName);
+
+        ServiceMultiResult<HouseBucketDTO> serviceResult = searchService.mapAggregate(cityEnName);
+
+        model.addAttribute("aggData", serviceResult.getResult());
+        model.addAttribute("total", serviceResult.getTotal());
+        model.addAttribute("regions", regions.getResult());
+        return "rent-map";
+    }
+
+    @GetMapping("rent/house/map/houses")
+    @ResponseBody
+    public ApiResponse rentMapHouses(@ModelAttribute MapSearch mapSearch) {
+        if (mapSearch.getCityEnName() == null) {
+            return ApiResponse.ofMessage(HttpStatus.BAD_REQUEST.value(), "必须选择城市");
+        }
+        ServiceMultiResult<HouseDTO> serviceMultiResult;
+        serviceMultiResult =  houseService.wholeMapQuery(mapSearch);
+
+        ApiResponse response = ApiResponse.ofSuccess(serviceMultiResult.getResult());
+        response.setMore(serviceMultiResult.getTotal() > (mapSearch.getStart() + mapSearch.getSize()));
+        return  response;
     }
 
 }

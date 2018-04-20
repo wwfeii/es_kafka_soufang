@@ -7,6 +7,7 @@ import java.util.Map;
 import com.wf.entity.SupportAddress;
 import com.wf.service.ServiceMultiResult;
 import com.wf.service.ServiceResult;
+import com.wf.service.search.BaiduMapLocation;
 import com.wf.web.dto.SubwayDTO;
 import com.wf.web.dto.SubwayStationDTO;
 import com.wf.web.dto.SupportAddressDTO;
@@ -56,6 +57,10 @@ public interface IAddressService {
     ServiceResult<SubwayStationDTO> findSubwayStation(Long subwayStationId);
 
     ServiceResult<SupportAddressDTO> findCity(String cityEnName);
+    /**
+     * 根据城市以及具体地位获取百度地图的经纬度
+     */
+    ServiceResult<BaiduMapLocation> getBaiduMapLocation(String cnName, String address);
 //
 //    /**
 //     * 获取地铁线信息
