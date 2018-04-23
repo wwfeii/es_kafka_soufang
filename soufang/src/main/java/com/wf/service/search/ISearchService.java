@@ -2,6 +2,7 @@ package com.wf.service.search;
 
 import com.wf.service.ServiceMultiResult;
 import com.wf.service.ServiceResult;
+import com.wf.web.form.MapSearch;
 import com.wf.web.form.RentSearch;
 
 import java.util.List;
@@ -48,4 +49,10 @@ public interface ISearchService {
 
     ServiceMultiResult<Long> mapQuery(String cityEnName, String orderBy, String orderDirection, int start, int size);
 
+    /**
+     * 基于地图查找
+     * @param mapSearch
+     * @return
+     */
+    ServiceMultiResult<Long> mapQuery(MapSearch mapSearch);
 }

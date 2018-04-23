@@ -61,44 +61,17 @@ public interface IAddressService {
      * 根据城市以及具体地位获取百度地图的经纬度
      */
     ServiceResult<BaiduMapLocation> getBaiduMapLocation(String cnName, String address);
-//
-//    /**
-//     * 获取地铁线信息
-//     * @param subwayId
-//     * @return
-//     */
-//    ServiceResult<SubwayDTO> findSubway(Long subwayId);
-//
-//    /**
-//     * 获取地铁站点信息
-//     * @param stationId
-//     * @return
-//     */
-//    ServiceResult<SubwayStationDTO> findSubwayStation(Long stationId);
-//
-//    /**
-//     * 根据城市英文简写获取城市详细信息
-//     * @param cityEnName
-//     * @return
-//     */
-//    ServiceResult<SupportAddressDTO> findCity(String cityEnName);
-//
-//    /**
-//     * 根据城市以及具体地位获取百度地图的经纬度
-//     */
-//    ServiceResult<BaiduMapLocation> getBaiduMapLocation(String city, String address);
-//
-//    /**
-//     * 上传百度LBS数据
-//     */
-//    ServiceResult lbsUpload(BaiduMapLocation location, String title, String address,
-//                            long houseId, int price, int area);
-//
-//    /**
-//     * 移除百度LBS数据
-//     * @param houseId
-//     * @return
-//     */
-//    ServiceResult removeLbs(Long houseId);
+    /**
+     * 上传百度LBS数据
+     */
+    ServiceResult lbsUpload(BaiduMapLocation location, String title, String address,
+                            long houseId, int price, int area);
+
+    /**
+     * 移除百度LBS数据
+     * @param houseId
+     * @return
+     */
+    ServiceResult removeLbs(Long houseId);
 }
 

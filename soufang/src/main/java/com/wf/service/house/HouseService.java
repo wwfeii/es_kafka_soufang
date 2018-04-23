@@ -5,6 +5,7 @@ import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.wf.base.HouseSort;
 import com.wf.base.HouseStatus;
+import com.wf.base.HouseSubscribeStatus;
 import com.wf.base.LoginUserUtil;
 import com.wf.entity.*;
 import com.wf.repository.*;
@@ -14,6 +15,7 @@ import com.wf.service.search.ISearchService;
 import com.wf.web.dto.HouseDTO;
 import com.wf.web.dto.HouseDetailDTO;
 import com.wf.web.dto.HousePictureDTO;
+import com.wf.web.dto.HouseSubscribeDTO;
 import com.wf.web.form.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -338,6 +341,76 @@ public class HouseService implements IHouseService{
         }
         List<HouseDTO> houses = wrapperHouseResult(serviceResult.getResult());
         return new ServiceMultiResult<>(serviceResult.getTotal(), houses);
+    }
+
+    @Override
+    public ServiceMultiResult<HouseDTO> boundMapQuery(MapSearch mapSearch) {
+        ServiceMultiResult<Long> serviceResult = searchService.mapQuery(mapSearch);
+        if (serviceResult.getTotal() == 0) {
+            return new ServiceMultiResult<>(0, new ArrayList<>());
+        }
+
+        List<HouseDTO> houses = wrapperHouseResult(serviceResult.getResult());
+        return new ServiceMultiResult<>(serviceResult.getTotal(), houses);
+    }
+
+    @Override
+    public ServiceResult addSubscribeOrder(Long houseId) {
+        Long userId = LoginUserUtil.getLoginUserId();
+        HouseSubscribe subscribe = subscribeRespository.findByHouseIdAndUserId(houseId, userId);
+        if (subscribe != null) {
+            return new ServiceResult(false, "已加入预约");
+        }
+        House house = houseRepository.findOne(houseId);
+        if (house == null) {
+            return new ServiceResult(false, "查无此房");
+        }
+        subscribe = new HouseSubscribe();
+        Date now = new Date();
+        subscribe.setCreateTime(now);
+        subscribe.setLastUpdateTime(now);
+        subscribe.setUserId(userId);
+        subscribe.setHouseId(houseId);
+        subscribe.setStatus(HouseSubscribeStatus.IN_ORDER_LIST.getValue());
+        subscribe.setAdminId(house.getAdminId());
+        subscribeRespository.save(subscribe);
+        return ServiceResult.success();
+    }
+
+    @Override
+    public ServiceMultiResult<Pair<HouseDTO, HouseSubscribeDTO>> querySubscribeList(HouseSubscribeStatus status, int start, int size) {
+        Long userId = LoginUserUtil.getLoginUserId();
+        Pageable pageable = new PageRequest(start / size, size, new Sort(Sort.Direction.DESC, "createTime"));
+        Page<HouseSubscribe> page = subscribeRespository.findAllByUserIdAndStatus(userId, status.getValue(), pageable);
+
+        return wrapper(page);
+    }
+    private ServiceMultiResult<Pair<HouseDTO, HouseSubscribeDTO>> wrapper(Page<HouseSubscribe> page) {
+        List<Pair<HouseDTO, HouseSubscribeDTO>> result = new ArrayList<>();
+
+        if (page.getSize() < 1) {
+            return new ServiceMultiResult<>(page.getTotalElements(), result);
+        }
+
+        List<HouseSubscribeDTO> subscribeDTOS = new ArrayList<>();
+        List<Long> houseIds = new ArrayList<>();
+        page.forEach(houseSubscribe -> {
+            subscribeDTOS.add(modelMapper.map(houseSubscribe, HouseSubscribeDTO.class));
+            houseIds.add(houseSubscribe.getHouseId());
+        });
+
+        Map<Long, HouseDTO> idToHouseMap = new HashMap<>();
+        Iterable<House> houses = houseRepository.findAll(houseIds);
+        houses.forEach(house -> {
+            idToHouseMap.put(house.getId(), modelMapper.map(house, HouseDTO.class));
+        });
+
+        for (HouseSubscribeDTO subscribeDTO : subscribeDTOS) {
+            Pair<HouseDTO, HouseSubscribeDTO> pair = Pair.of(idToHouseMap.get(subscribeDTO.getHouseId()), subscribeDTO);
+            result.add(pair);
+        }
+
+        return new ServiceMultiResult<>(page.getTotalElements(), result);
     }
 
     private List<HouseDTO> wrapperHouseResult(List<Long> houseIds) {
